@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5146c8">
+<meta name="description" content="Aprende las tablas de multiplicar jugando con Tigrito.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Tigrito y las tablas</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#20233a;background:#f4f5ff}
+*{box-sizing:border-box}body{margin:0;padding:16px;max-width:650px;margin:auto}
+button{font:inherit;cursor:pointer;border:0}
+.hero{background:linear-gradient(135deg,#394ec7,#874bd1);color:white;border-radius:22px;padding:20px;text-align:center}
+.pet{font-size:65px;line-height:1.3}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.stat{background:#ffffff25;border-radius:12px;padding:9px}.stat b{display:block;font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:12px 0}
+.panel{background:white;border:1px solid #e1e2ef;border-radius:16px;padding:15px}
+.menu{text-align:left}.menu .emoji{font-size:30px;display:block}.menu b{display:block;margin-top:5px}
+.btn{background:#6254d9;color:white;border-radius:13px;padding:13px 16px;font-weight:800;width:100%;margin-top:10px}
+.soft{background:#ecebfa;color:#37335f;border-radius:12px;padding:11px 14px;font-weight:700}
+.answer{background:white;border:2px solid #ddddec;border-radius:14px;padding:17px 8px;font-size:24px;font-weight:900}
+.answer.good{border-color:#16865b;background:#e4f7ed}.answer.bad{border-color:#d94b4b;background:#fff0f0}
+.bar{height:10px;background:#e8e8f2;border-radius:20px;overflow:hidden;margin:14px 0}.bar div{height:100%;background:#20a879}
+.center{text-align:center}.big{font-size:48px;font-weight:900;margin:15px}.muted{color:#686b82;font-size:14px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}.tab{background:white;border:1px solid #ddddec;border-radius:10px;padding:10px;font-weight:800}
+input{width:100%;padding:14px;border:2px solid #ddddec;border-radius:12px;font-size:24px;text-align:center}
+[hidden]{display:none!important}
+@media(min-width:520px){body{padding:24px}.grid{gap:14px}}
+</style>
+</head>
+<body>
+<header class="hero">
+ <div class="muted" style="color:#eee;font-weight:800;letter-spacing:2px">LA AVENTURA DE NICO</div>
+ <div class="pet" id="pet">🐯</div><h1 style="margin:0;font-size:27px">¡TIGRITO Y LAS TABLAS!</h1>
+ <p id="petmsg">¡Hola, Nico! ¿Preparado para convertirte en un campeón?</p>
+ <div class="stats"><div class="stat"><b id="stars">0 ⭐</b><small>Estrellas</small></div><div class="stat"><b id="level">1</b><small>Nivel</small></div><div class="stat"><b id="hits">0</b><small>Aciertos</small></div></div>
+</header>
+<main>
+<section id="menu">
+ <h2>¿Qué aventura hacemos hoy?</h2>
+ <div class="grid">
+  <button class="panel menu" data-start="learn"><span class="emoji">📚</span><b>Aprender</b><span class="muted">Las tablas del 1 al 10</span></button>
+  <button class="panel menu" data-start="choice"><span class="emoji">🎮</span><b>Jugar</b><span class="muted">Elige la respuesta</span></button>
+  <button class="panel menu" data-start="exam"><span class="emoji">✍️</span><b>Modo examen</b><span class="muted">Escribe el resultado</span></button>
+  <button class="panel menu" data-start="timer"><span class="emoji">⏱️</span><b>Contrarreloj</b><span class="muted">60 segundos</span></button>
+  <button class="panel menu" style="grid-column:1/-1" data-start="review"><span class="emoji">🎯</span><b>Entrenar mis errores</b><span class="muted">Practica las operaciones más difíciles</span></button>
+ </div>
+ <h2>📖 Elige una tabla</h2><div class="tabs" id="tables"></div>
+ <div class="panel"><b>🏅 Mis medallas</b><div class="grid" id="medals"></div></div>
+ <button class="soft" style="width:100%;margin-top:10px" id="reset">Reiniciar progreso</button>
+</section>
+<section id="learn" hidden>
+ <button class="soft" data-menu>← Volver</button><h2 id="learnname">Tabla del 1</h2>
+ <div class="tabs" id="learnselect"></div><div class="grid" id="learnrows"></div>
+ <button class="btn" id="practiceTable">¡Practicar esta tabla! 🚀</button>
+</section>
+<section id="play" hidden>
+ <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><button class="soft" data-menu>✕ Salir</button><b id="modeName">Juego</b><b id="clock">⭐ 0</b></div>
+ <div class="bar"><div id="progress" style="width:0%"></div></div>
+ <div class="panel center"><div class="pet" id="gamepet">🐯</div><div class="muted" style="font-weight:800">¿CUÁNTO ES?</div><div class="big" id="sum">4 × 5 = ?</div><div class="muted" id="counter">Pregunta 1 de 10</div></div>
+ <div id="choices" class="grid"></div>
+ <div id="typing" hidden style="display:flex;gap:8px;margin-top:12px"><input id="answer" type="number" inputmode="numeric" placeholder="Tu respuesta"><button class="btn" id="check" style="width:auto;margin:0">Comprobar</button></div>
+ <div id="message" class="center" style="font-weight:800;min-height:48px;padding:12px" aria-live="polite"></div>
+ <button class="btn" id="next" hidden>Siguiente ➜</button>
+</section>
+<section id="result" class="panel center" hidden>
+ <div class="pet" id="endpet">🏆</div><h2 id="endtitle">¡Gran trabajo!</h2><div class="big" id="endscore">8/10</div><div id="endmsg" class="muted"></div><h3 id="earned">¡Has ganado estrellas!</h3>
+ <button class="btn" id="replay">Jugar otra vez</button><button class="soft" style="width:100%;margin-top:8px" data-menu>Volver al mapa</button>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id), KEY='nico_tablas_adventure_v1';
+let data={stars:0,hits:0,total:0,errors:{},best:0,played:0};
+try{data={...data,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){}
+let mode='choice',table=0,qs=[],i=0,score=0,earned=0,done=false,timer=null,seconds=60,last='choice';
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function update(){
+ $('stars').textContent=data.stars+' ⭐';$('hits').textContent=data.hits;$('level').textContent=1+Math.floor(data.stars/20);
+ const ms=[['🥉','Primeros pasos',data.hits>=10],['🥈','Aprendiz',data.stars>=20],['🥇','Experto',data.stars>=50],['🏆','Maestro',data.stars>=100],['🔥','Supervelocidad',data.best>=10],['🎯','Perfeccionista',data.total>=30&&data.hits/data.total>=.9]];
+ $('medals').innerHTML='';ms.forEach(x=>{let d=document.createElement('div');d.className='panel center';d.innerHTML=`<div style="font-size:25px">${x[2]?x[0]:'🔒'}</div><b>${x[1]}</b>`;$('medals').append(d)});
+}
+function show(id){['menu','learn','play','result'].forEach(x=>$(x).hidden=x!==id)}
+function learn(n){table=n;$('learnname').textContent='Tabla del '+n;$('learnselect').innerHTML='';for(let j=1;j<=10;j++){let b=document.createElement('button');b.className='tab';b.textContent=j;b.onclick=()=>learn(n);$('learnselect').append(b)}$('learnrows').innerHTML='';for(let j=1;j<=10;j++){let d=document.createElement('div');d.className='panel center';d.innerHTML=`<span class="muted">${n} × ${j} = </span><b style="font-size:21px">${n*j}</b>`;$('learnrows').append(d)}show('learn')}
+function shuffle(a){for(let j=a.length-1;j>0;j--){let k=Math.floor(Math.random()*(j+1));[a[j],a[k]]=[a[k],a[j]]}return a}
+function start(m,t=0){
+ clearInterval(timer);mode=last=m;table=t;score=0;i=0;earned=0;qs=[];
+ if(m==='review'){let keys=Object.keys(data.errors).filter(k=>data.errors[k]>0);if(!keys.length){$('petmsg').textContent='¡Todavía no hay errores! Prueba primero el modo jugar.';return}qs=shuffle(keys.flatMap(k=>Array.from({length:Math.min(3,data.errors[k])},()=>{let [a,b]=k.split('x').map(Number);return {a,b}}))).slice(0,10)}
+ else{for(let j=0;j<(m==='timer'?100:10);j++)qs.push({a:t||1+Math.floor(Math.random()*10),b:1+Math.floor(Math.random()*10)});shuffle(qs)}
+ $('modeName').textContent=({choice:'🎮 Juego',exam:'✍️ Examen',timer:'⏱️ Contrarreloj',review:'🎯 Repaso'})[m];
+ if(m==='timer'){seconds=60;timer=setInterval(()=>{seconds--;$('modeName').textContent='⏱️ '+seconds+' segundos';if(seconds<=0)finish()},1000)}
+ show('play');render()
+}
+function render(){
+ if(i>=qs.length){finish();return}done=false;let q=qs[i];$('sum').textContent=`${q.a} × ${q.b} = ?`;$('counter').textContent=`Pregunta ${i+1}${mode==='timer'?'':' de '+qs.length}`;$('clock').textContent='⭐ '+score;$('progress').style.width=(i/qs.length*100)+'%';$('message').textContent='';$('next').hidden=true;$('typing').hidden=mode!=='exam';$('choices').hidden=mode==='exam';$('gamepet').textContent='🐯';$('answer').value='';
+ if(mode!=='exam'){let c=q.a*q.b,o=new Set([c]);while(o.size<4)o.add(Math.max(1,c+Math.floor(Math.random()*17)-8));$('choices').innerHTML='';shuffle([...o]).forEach(v=>{let b=document.createElement('button');b.className='answer';b.textContent=v;b.onclick=()=>check(v,b);$('choices').append(b)})}
+}
+function check(v,button){
+ if(done)return;done=true;let q=qs[i],correct=q.a*q.b;data.total++;let ok=Number(v)===correct;
+ if(ok){score++;data.hits++;earned++;data.stars++;$('message').textContent=['¡Genial, Nico! 🎉','¡Eres un crack! ⭐','¡Tigrito está orgulloso! 🐯','¡Respuesta perfecta! 🚀'][Math.floor(Math.random()*4)];$('message').style.color='#16865b';$('gamepet').textContent='🐯🎉'}
+ else{let k=q.a+'x'+q.b;data.errors[k]=(data.errors[k]||0)+1;$('message').textContent='¡No pasa nada! La respuesta es '+correct+'. ¡A por la siguiente! 💪';$('message').style.color='#b87822';$('gamepet').textContent='🐯💚'}
+ if(mode!=='exam')$('choices').querySelectorAll('button').forEach(b=>{b.disabled=true;if(Number(b.textContent)===correct)b.classList.add('good');else if(b===button)b.classList.add('bad')});
+ save();update();$('clock').textContent='⭐ '+score;$('next').hidden=false;$('next').textContent=i===qs.length-1||mode==='timer'?'Ver resultados 🏆':'Siguiente ➜'
+}
+function finish(){clearInterval(timer);data.played++;data.best=Math.max(data.best,score);save();update();show('result');$('endscore').textContent=score+(mode==='timer'?' aciertos':' / '+qs.length);$('endtitle').textContent=score>=8?'¡CAMPEÓN DE LAS TABLAS! 🏆':score>=5?'¡MUY BIEN, NICO! ⭐':'¡SIGUE ENTRENANDO! 💪';$('endpet').textContent=score>=8?'🐯🏆':'🐯';$('endmsg').textContent=score>=8?'¡Tigrito está dando saltos de alegría!':'Cada día aprenderás un poquito más. ¡No te rindas!';$('earned').textContent='¡Has ganado '+earned+' estrellas! ⭐'}
+document.querySelectorAll('[data-menu]').forEach(b=>b.onclick=()=>{clearInterval(timer);show('menu');$('petmsg').textContent='¡Bienvenido de nuevo, campeón! ¿Qué aventura toca?'});
+document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>b.dataset.start==='learn'?learn(1):start(b.dataset.start));
+$('practiceTable').onclick=()=>start('choice',table);$('next').onclick=()=>{i++;render()};$('check').onclick=()=>{if($('answer').value.trim()!=='')check($('answer').value)};$('answer').onkeydown=e=>{if(e.key==='Enter')$('check').click()};$('replay').onclick=()=>start(last,last==='choice'?table:0);
+$('reset').onclick=()=>{if(confirm('¿Seguro que quieres borrar todos los puntos, medallas y errores?')){data={stars:0,hits:0,total:0,errors:{},best:0,played:0};save();update();$('petmsg').textContent='¡Nueva aventura! ¡Vamos a aprender!'}};
+for(let n=1;n<=10;n++){let b=document.createElement('button');b.className='tab';b.textContent=n+'×';b.onclick=()=>learn(n);$('tables').append(b)}update();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
